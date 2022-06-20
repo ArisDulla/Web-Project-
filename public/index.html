@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="topnav">
+    <a href="">Αρχικη Σελιδα</a>
+    <a href="#inputBook">Καταχώρηση νέου βιβλίου</a>
+    <a href="#searchBook">Αναζήτηση βιβλίου με λέξη κλειδί</a>
+  </div>
+
+  <a href="">
+    <img href="" src="libaryLog.jpg">
+  </a>
+  <div class="divMenu">
+
+    <div class="vertical-menu">
+      <a href="#inputBook" >Καταχώρηση νέου βιβλίου</a>
+      <a href="#searchBook" >Αναζήτηση βιβλίου με λέξη κλειδί</a>
+    </div>
+
+  </div>
+
+  <div class="divDisplay" id="inputBook" style="display:none">
+
+    <div>
+      <br>
+      <p style="text-align:center"><b>Καταχώρηση νέου βιβλίου </b></p>
+
+      <label for="fId"><b>- ID :</b></label>
+
+      <input type="number" id="fId" name="fId" min="1" max="99999999">
+
+      <b id="messageInputFId"></b>
+      <br><br>
+      <label for="fauthor"><b>- Author :</b></label>
+
+      <input type="text" id="fauthor" name="fauthor" onkeydown="return /[a-z]/i.test(event.key)">
+
+      <b id="messageInputFauthor"></b>
+      <br><br>
+      <label for="ftitle"><b>- Title :</b></label>
+
+      <input type="text" id="ftitle" name="ftitle" onkeydown="return /[a-z]/i.test(event.key)">
+
+      <b id="messageInputFtitle"></b>
+      <br><br>
+      <label for="fprice"><b>- Price :</b></label>
+
+      <input type="number" id="fprice" name="fprice" min="1" max="99999999">
+
+      <b id="messageInputFprice"></b>
+      <br><br>
+      <label for="genre"><b>- Choose a genre:</b></label>
+      <select name="genre" id="genre">
+        <option value="science fiction">Sciencefiction</option>
+        <option value="satire">Satire</option>
+        <option value="drama">Drama</option>
+        <option value="action and Adventure">ActionandAdventure</option>
+        <option value="romance">Romance</option>
+        <option value="mystery">Mystery</option>
+        <option value="horror">Horror</option>
+      </select>
+      <br><br>
+      <input type="submit" id="divInputBooks" value="Submit">
+    </div>
+    <div style="text-align:center">
+      <b><p style="text-align:center" id="messageResult"> </p></b>
+    </div>
+  </div>
+
+
+  <div class="divDisplay" id="searchBook" style="display:none">
+
+    <div>
+      <br>
+      <p style="text-align:center"><b> Αναζήτηση βιβλίου με λέξη κλειδί </b></p>
+      <label for="keyBook"><b>- Λέξη κλειδί:</b></label>
+      <input type="text" id="keyBook" name="keyBook">
+      <b id="messageKeyBook"></b>
+      <br>
+      <input type="submit" id="submit22" value="submit">
+    </div>
+    <input class="button button1" id="allBooks" value="SEE ALL BOOKS">
+
+
+    <br>
+    <br>
+    <b>
+      <p id="messageRdemoAesult22" style="text-align:center"> </p>
+    </b>
+
+    <div id="table-wrapper">
+      <div id="table-scroll">
+        <table id="demoA" >
+          <thead>
+            <tr>
+              <td><span class="text"></span></td>
+              <td><span class="text"></span></td>
+              <td><span class="text"></span></td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+
+<script>
+
+  window.onload = function (event) {
+    demoA.innerHTML = "";
+
+    const baseUrl = 'http://localhost:3000/newBook/';
+    const baseUrlK2 = 'http://localhost:3000/allBooks/';
+
+    document.getElementById('allBooks').addEventListener('click', async function (event) {
+
+      let flag;
+
+      var text = "";
+      flag = 0;
+
+      const response = await fetch(baseUrlK2);
+      const body = await response.json();
+
+      if (response.ok) {
+        demoA.innerHTML = "";
+        const objsArrStr = JSON.stringify(body);
+        const obj = JSON.parse(objsArrStr);
+        var size = Object.keys(obj).length;
+
+        console.log(obj);
+        // (B1) GET TABLE
+        var table = document.getElementById("demoA");
+
+        messageRdemoAesult22.innerHTML = "";
+
+        var row = table.insertRow(0);
+        var cell = row.insertCell();
+        cell.innerHTML = 'Author';
+        cell = row.insertCell();
+        cell.innerHTML = 'Title';
+        cell = row.insertCell();
+        cell.innerHTML = 'Genre';
+
+        for (let i = 0; i < size; i++) {
+          // (B2) INSERT ROW   
+          var row = table.insertRow(1);
+          // (B3) INSERT CELLS
+          var cell = row.insertCell();
+          cell.innerHTML = obj[i].author;
+          cell = row.insertCell();
+          cell.innerHTML = obj[i].title;
+          cell = row.insertCell();
+          cell.innerHTML = obj[i].genre;
+        }
+      }
+    });
+
+    document.getElementById('divInputBooks').addEventListener('click', async function (event) {
+
+      if (flag()) {
+
+        const fid = document.getElementById("fId").value;
+        const fauthor = document.getElementById("fauthor").value;
+        const ftitle = document.getElementById("ftitle").value;
+        const fprice = document.getElementById("fprice").value;
+        const fgenre = document.getElementById("genre").value;
+
+
+        const student = { fid, fauthor, ftitle, fprice, fgenre };
+
+        const response = await fetch(baseUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(student)
+
+        });
+        const body = await response.json();
+
+        console.log(body);
+
+        if (response.ok) {
+          demoA.innerHTML = "";
+          messageResult.innerHTML = "καταχωρήθηκε με επιτυχία";
+        } else {
+          messageResult.innerHTML = "ΔΕΝ καταχωρήθηκε ,διοτι υπαρχει ηδη το ID";
+        }
+        document.getElementById("fauthor").value = "";
+        document.getElementById("ftitle").value = "";
+        document.getElementById("fprice").value = "";
+        document.getElementById("fId").value = "";
+      }
+    });
+
+    document.getElementById('submit22').addEventListener('click', async function (event) {
+
+
+      if (flag2()) {
+
+        var baseUrlK1;
+        let flag;
+        var keys = ['title/', 'author/', "genre/"];
+
+        var text = "";
+        flag = 0;
+        for (let i = 0; i < 3; i++) {
+
+          baseUrlK1 = 'http://localhost:3000/';
+          baseUrlK1 += keys[i];
+          const userID = document.getElementById('keyBook').value;
+
+          const url = baseUrlK1 + userID;
+
+          const response = await fetch(url);
+          const body = await response.json();
+
+          if (response.ok) {
+            demoA.innerHTML = "";
+            const objsArrStr = JSON.stringify(body);
+            demoA.innerHTML = "";
+            const obj = JSON.parse(objsArrStr);
+            var size = Object.keys(obj).length;
+
+            // (B1) GET TABLE
+            var table = document.getElementById("demoA");
+
+            messageRdemoAesult22.innerHTML = "";
+            var row = table.insertRow(0);
+            var cell = row.insertCell();
+            cell.innerHTML = 'Author';
+            cell = row.insertCell();
+            cell.innerHTML = 'Title';
+            cell = row.insertCell();
+            cell.innerHTML = 'Genre';
+            for (let i = 0; i < size; i++) {
+              // (B2) INSERT ROW   
+              var row = table.insertRow(1);
+              // (B3) INSERT CELLS
+              var cell = row.insertCell();
+              cell.innerHTML = obj[i].author;
+              cell = row.insertCell();
+              cell.innerHTML = obj[i].title;
+              cell = row.insertCell();
+              cell.innerHTML = obj[i].genre;
+            }
+
+            flag = 1;
+          }
+        }
+        if (flag == 0) {
+
+          messageRdemoAesult22.innerHTML = " ΔΕΝ ΒΡΕΘΗΚΑΝ ΑΠΟΤΕΛΕΣΜΑΤΑ  ";
+          demoA.innerHTML = "";
+        }
+      }
+      document.getElementById('keyBook').value = '';
+    });
+
+  }
+
+  function flag() {
+    messageResult.innerHTML = " ";
+    const text1 = document.getElementById("fauthor").value;
+    const text2 = document.getElementById("ftitle").value;
+    const text3 = document.getElementById("fprice").value;
+    const text4 = document.getElementById("fId").value;
+
+    var flag;
+    flag = 0;
+
+    if (text1 == "") {
+      messageInputFauthor.innerHTML = "Αυτό είναι απαραίτητο.";
+      flag = 1;
+    }
+    else {
+      messageInputFauthor.innerHTML = "";
+    }
+
+    if (text2 == "") {
+      messageInputFtitle.innerHTML = "Αυτό είναι απαραίτητο.";
+      flag = 1;
+    } else {
+      messageInputFtitle.innerHTML = " ";
+    }
+    if (text3 == "") {
+      messageInputFprice.innerHTML = "Αυτό είναι απαραίτητο.";
+      flag = 1;
+    } else {
+      messageInputFprice.innerHTML = "";
+    }
+    if (text4 == "") {
+      messageInputFId.innerHTML = "Αυτό είναι απαραίτητο.";
+      flag = 1;
+    } else {
+      messageInputFId.innerHTML = "";
+    }
+    if (flag == 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  function flag2() {
+    const text1 = document.getElementById("keyBook").value;
+
+    var flag;
+    flag = 0;
+    if (text1 == "") {
+      demoA.innerHTML = "";
+      messageKeyBook.innerHTML = "Αυτό είναι απαραίτητο.";
+      messageRdemoAesult22.innerHTML = "";
+
+      flag = 1;
+    } else {
+      messageKeyBook.innerHTML = "";
+    }
+    if (flag == 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+</script>
+
+</html>
